@@ -1,0 +1,35 @@
+services:
+  backend:
+    build: ./backend
+    container_name: sandbox_swift-vale-gm3r_backend
+    restart: always
+    environment:
+      - DEBUG=False
+      - ALLOWED_HOSTS=swift-vale-gm3r.sandbox.architeq.tech
+    networks:
+      - architeq_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.swift-vale-gm3r-api.rule=Host(`swift-vale-gm3r.sandbox.architeq.tech`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.swift-vale-gm3r-api.entrypoints=websecure"
+      - "traefik.http.routers.swift-vale-gm3r-api.tls.certresolver=myresolver"
+      - "traefik.http.services.swift-vale-gm3r-api.loadbalancer.server.port=8000"
+
+  frontend:
+    build: ./frontend
+    container_name: sandbox_swift-vale-gm3r_frontend
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=https://swift-vale-gm3r.sandbox.architeq.tech
+    networks:
+      - architeq_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.swift-vale-gm3r.rule=Host(`swift-vale-gm3r.sandbox.architeq.tech`)"
+      - "traefik.http.routers.swift-vale-gm3r.entrypoints=websecure"
+      - "traefik.http.routers.swift-vale-gm3r.tls.certresolver=myresolver"
+      - "traefik.http.services.swift-vale-gm3r.loadbalancer.server.port=3000"
+
+networks:
+  architeq_network:
+    external: true
